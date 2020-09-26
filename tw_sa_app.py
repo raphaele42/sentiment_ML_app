@@ -18,7 +18,7 @@ from sklearn.linear_model import SGDClassifier
 from sklearn.metrics import plot_confusion_matrix, plot_roc_curve, plot_precision_recall_curve
 from sklearn.metrics import precision_score, recall_score
 from sklearn.decomposition import TruncatedSVD
-import matplotlib
+import matplotlib  #needed by heroku for executing plot confusion matrix
 
 
 ###########################
@@ -102,9 +102,6 @@ def main():
         st.sidebar.subheader("Feature extraction")
         ngram_range = st.sidebar.radio('N-grams', [(1, 1), (1, 2)])
         use_idf = st.sidebar.radio('Use idf', ('True', 'False'))
-        # choose number of PCA
-        st.sidebar.subheader("Parameters reduction")
-        n_components = st.sidebar.radio('Number of PCA components', (600, 700, 800))
         #choose parameters
         st.sidebar.subheader("Model Hyperparameters")
         loss= st.sidebar.radio('Loss', ('hinge', 'log', 'modified_huber', 'squared_hinge', 'perceptron'))
@@ -119,7 +116,6 @@ def main():
         
         model = Pipeline([('vect', CountVectorizer(analyzer='word', ngram_range=ngram_range)),
                    ('tfidf', TfidfTransformer(use_idf = use_idf)),
-                   ('pca', TruncatedSVD(n_components = n_components)),
                    ('clf', SGDClassifier(loss = loss, penalty = penalty, 
                                          alpha=alpha, random_state=42, 
                                          max_iter=5, tol=None))])
@@ -137,9 +133,6 @@ def main():
         st.sidebar.subheader("Feature extraction")
         ngram_range = st.sidebar.radio('N-grams', [(1, 1), (1, 2)])
         use_idf = st.sidebar.radio('Use idf', ('True', 'False'))
-        # choose number of PCA
-        st.sidebar.subheader("Parameters reduction")
-        n_components = st.sidebar.radio('Number of PCA components', (600, 700, 800))
         st.sidebar.subheader("Model Hyperparameters")
         #choose parameters
         C = st.sidebar.number_input("C (Regularization parameter)", 5.0, 10.0, step=0.01, key='C_LR')
@@ -152,7 +145,6 @@ def main():
         
         model = Pipeline([('vect', CountVectorizer(analyzer='word', ngram_range=ngram_range)),
                    ('tfidf', TfidfTransformer(use_idf = use_idf)),
-                   ('pca', TruncatedSVD(n_components = n_components)),
                    ('clf', LogisticRegression(C=C, max_iter=max_iter, 
                                               penalty = penalty, random_state=42))])
         model.fit(X_train, y_train)
@@ -171,7 +163,7 @@ def main():
         use_idf = st.sidebar.radio('Use idf', ('True', 'False'))
         st.sidebar.subheader("Model Hyperparameters")
         #choose parameters
-        alpha = st.sidebar.radio("Alpha", (0.0001, 0.001, 0.01, 0.5, 0.8, 0.9, 1))
+        alpha = st.sidebar.radio("Alpha", (0.0001, 0.001, 0.01, 0.1))
         fit_prior = st.sidebar.radio("Learn class prior probabilities", ('True', 'False'))
 
         metrics = st.sidebar.multiselect("What metrics to plot?", ['Confusion Matrix', 'ROC Curve', 'Precision-Recall Curve'], 

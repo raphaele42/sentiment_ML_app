@@ -12,11 +12,12 @@ Sentiment analysis of social media posts.
 * Heroku
 
 **Table of content**
-* [Corpus](#1-corpus)
-* [Model selection](#2-model-selection)
-* [Application](#3-application)
+* [Corpus](#corpus)
+* [Model selection](#model)
+* [Application](#application)
 
- 
+
+<a name="corpus"/>
 ## 1 - Corpus
 
 The model will be trained on a set of 1220 tweets labelled as positive or negative. The corpus is built by collating a list of labelled IDs with the corresponding tweet text, via the Twitter API. Output: a text file to train the model and a text file with new unclassified tweets.
@@ -25,7 +26,7 @@ Full code available [here](https://github.com/raphaele42/sentiment_a/blob/master
 
 
 
-
+<a name="model"/>
 ## 2 - Model selection
 
 **Goal:** explore three algortithms to determine if they are relevant to perform this task and what range of hyper parameters can ve provided to users for optimisation.
@@ -256,6 +257,8 @@ After running these 3 algorithms with a range of parameters and values, decision
 
 Full code fir this step is here: https://github.com/raphaele42/sentiment_a/blob/master/tw_sa_mod.py
 
+
+<a name="application"/>
 ## 3 - Application
 
 

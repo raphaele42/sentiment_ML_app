@@ -4,6 +4,10 @@
 
 **Try the app:** [https://twsent.herokuapp.com/](https://twsent.herokuapp.com/)
 
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=YOUTUBE_VIDEO_ID_HERE
+" target="_blank"><img src="http://img.youtube.com/vi/p4adZ2ZYfAo/0.jpg" 
+alt="Preview of the app functionalities" width="240" height="180" border="10" /></a>
+
 **Technologies:**
 * Python
 * Scikit Learn

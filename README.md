@@ -6,7 +6,7 @@
 
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=YOUTUBE_VIDEO_ID_HERE
 " target="_blank"><img src="http://img.youtube.com/vi/p4adZ2ZYfAo/0.jpg" 
-alt="Preview of the app functionalities" width="240" height="180" border="10" /></a>
+alt="Preview of the app functionalities" width="600" border="10" /></a>
 
 **Technologies:**
 * Python

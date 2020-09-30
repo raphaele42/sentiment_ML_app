@@ -1,12 +1,12 @@
 # Sentiment Analysis of a corpus of tweets
  
-**Summary:** The goal of this project is to predict the sentiment on a corpus of tweets as positive or negative. An app was developed for users to select the best model and apply it to a new set of tweets. The steps of the project are: bulding a corpus of labelled tweets, selecting models to compare and publishing an app for users to select the most performant model.
+**Summary:** The goal of this project is to predict the sentiment on a corpus of tweets as positive or negative. An app was developed for users to select the best model and apply it to a new set of tweets. The steps of the project are: building a corpus of labelled tweets, selecting models to compare and publishing an app for users to select the most performant model.
 
 **Try the app:** [https://twsent.herokuapp.com/](https://twsent.herokuapp.com/)
 
 ![Preview of section 2](https://github.com/raphaele42/sentiment_a/blob/master/preview.png "Preview")
 
-[Preview video (1.23 minutes](http://www.youtube.com/watch?v=p4adZ2ZYfAo)
+[Preview video (1.23 minutes)](http://www.youtube.com/watch?v=p4adZ2ZYfAo)
 
 **Technologies:**
 * Python

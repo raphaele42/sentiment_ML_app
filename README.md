@@ -25,12 +25,14 @@ Full code available here: https://github.com/raphaele42/sentiment_a/blob/master/
 
 
 ## 2 - Model selection
-Full code here: https://github.com/raphaele42/sentiment_a/blob/master/tw_sa_mod.py
 
-Goal: explore three algortithms to determine if they are relevant to perform this task and what range of hyper parameters can ve provided to users for optimisation.
+**Goal:** explore three algortithms to determine if they are relevant to perform this task and what range of hyper parameters can ve provided to users for optimisation.
 
-Method: pipeline and grid search
+**Algorithms:** Logistic Regression is a quick and robust algorithm for binary classification problems like this one. Support Vector Machine (SVM) and Naive Bayes have also shown good results for text classification.
 
+**Methodology:** for each algorithm, a pipeline  is built for vectorisation, transformation, feature reduction (if applicable) and classification. Then a grid search is applied to the pipeline with a range of parameter values. This way we can determine which combination of parameters yields the most performant model.
+
+### Import modules
 ```
 import json
 import numpy as np
@@ -46,24 +48,21 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.linear_model import LogisticRegression
 from sklearn.linear_model import SGDClassifier
 from sklearn import metrics
+```
 
+### Import data
 
-
-###########################
-# import data
-###########################
-
+```
 def load_data():
     # import tweet data as collected in tweet_corpus.py
     # read the tweets file to a list
     with open('model_tweets.txt', 'r') as f:
         model_data = json. loads(f. read())
     return model_data
+```
+### Pre-processing data
 
-
-########################
-# pre processing data 
-########################
+```
 
 # clean tweets text
 def clean_text(raw_tweets):
@@ -86,11 +85,11 @@ def split_variables(full_data):
     # object for target variable ie sentiment
     y_tweet_sentiment = [tweet['label'] for tweet in full_data]
     return(y_tweet_sentiment, x_tweet_text)
+```
 
+### Feature extraction
 
-##########
-# feature extraction
-###########
+```
 def feature(x_var):
     # tokenisation and vectorization of x data
     # break down x data to word units, add 1-grams and 2-grams
@@ -102,11 +101,11 @@ def feature(x_var):
     tfidf_transformer = TfidfTransformer()
     x_var = tfidf_transformer.fit_transform(x_var_counts)
     return(x_var)
+```
 
-########################
-# main data prep function
-########################
+### Call all data prep functions
 
+```
 def prep_data():
     # get data
     model_data = load_data()
@@ -119,11 +118,11 @@ def prep_data():
     return (X_train, X_test, y_train, y_test)
 
 X_train, X_test, y_train, y_test = prep_data()
+```
 
-########################
-# logistic regression
-########################
+### Logistic regression
 
+```
 # pipeline data vectorisation => transformation => feature reduction => classifier
 lg_clf = Pipeline([('vect', CountVectorizer()),
                    ('tfidf', TfidfTransformer()),
@@ -155,10 +154,12 @@ for param_name in sorted(lg_parameters.keys()):
     
 # note about PCA: it does not improve performance and increases running time significantly,
 # so no feature reduction will be applied to these models
+```
 
-########################
-# Naive Bayes
-########################
+### Naive Bayes
+
+```
+
 
 # pipeline data vectorisation => transformation => classifier
 nb_clf = Pipeline([('vect', CountVectorizer()),
@@ -189,11 +190,13 @@ for param_name in sorted(nb_parameters.keys()):
 #clf__alpha: 0.01
 #tfidf__use_idf: False
 #vect__ngram_range: (1, 1)
-    
-########################
-# SVM
-########################
+```
 
+
+### SVM
+
+
+```
 # pipeline data vectorisation => transformation => feature reduction => classifier
 svm_clf = Pipeline([('vect', CountVectorizer()),
                    ('tfidf', TfidfTransformer()),
@@ -226,15 +229,13 @@ for param_name in sorted(svm_parameters.keys()):
 #clf__penalty: 'l2'
 #tfidf__use_idf: True
 #vect__ngram_range: (1, 1)
-
-
-
 ```
 
 
 
-Conclusions:
+### Conclusions:
 
+Full code fir this step is here: https://github.com/raphaele42/sentiment_a/blob/master/tw_sa_mod.py
 
 ## 3 - Application
 

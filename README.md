@@ -8,6 +8,9 @@
 " target="_blank"><img src="http://img.youtube.com/vi/p4adZ2ZYfAo/0.jpg" 
 alt="Preview of the app functionalities" width="600" border="10" /></a>
 
+
+[![Preview](http://img.youtube.com/vi/p4adZ2ZYfAo/0.jpg)](http://www.youtube.com/watch?v=p4adZ2ZYfAo)
+
 **Technologies:**
 * Python
 * Scikit Learn

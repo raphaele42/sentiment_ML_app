@@ -3,16 +3,18 @@ Sentiment analysis of social media posts.
  Online app is here: https://twsent.herokuapp.com/
  do you see the change?
  
-This project goal is to predict the sentiment on a corpus of tweets as positive or negative, to allow for further analysis. An app was published for users to select the best model and apply it to a new set of tweets. It includes bulding a corpus of labelled tweets, selecting models to compare and allow users to select the most performant model via a web app.
+**Summary:** The goal of this project is to predict the sentiment on a corpus of tweets as positive or negative. An app was developed for users to select the best model and apply it to a new set of tweets. The steps of the project are: bulding a corpus of labelled tweets, selecting models to compare and publishing an app for users to select the most performant model.
 
-Technologies:
-Python
-Scikit Learn
-Streamlit
+**Technologies:**
+* Python
+* Scikit Learn
+* Streamlit
+* Heroku
 
-Table of content
-
-
+**Table of content**
+* [Corpus](#1-corpus)
+* [Model selection](#2-model-selection)
+* [Application](#3-application)
 
  
 ## 1 - Corpus
@@ -33,7 +35,7 @@ Full code available [here](https://github.com/raphaele42/sentiment_a/blob/master
 **Methodology:** for each algorithm, a pipeline  is built for vectorisation, transformation, feature reduction (if applicable) and classification. Then a grid search is applied to the pipeline with a range of parameter values. This way we can determine which combination of parameters yields the most performant model.
 
 ### Import modules
-```
+```python
 import json
 import numpy as np
 from pandas import Series, DataFrame
@@ -54,7 +56,7 @@ from sklearn import metrics
 
 Importing the data set that was built [here](https://github.com/raphaele42/sentiment_a/blob/master/tweet_corpus.py). 
 
-```
+```python
 def load_data():
     # import tweet data as collected in tweet_corpus.py
     # read the tweets file to a list
@@ -66,8 +68,7 @@ def load_data():
 
 Cleaning the tweets invlove turning all text into lower case standard characters, to prepare it for vectorisation. Then the data is split into prediction (y) and explanatory (x) variables.
 
-```
-
+```python
 # clean tweets text
 def clean_text(raw_tweets):
     import re
@@ -95,7 +96,7 @@ def split_variables(full_data):
 
 To make the x variables compatible with the selected algorithm, the simple text must be broken down into word units (tokenisation) of single words (1-grams) or 2 words (2-grams). The data is then turned into numbers (vectorisation) and the frequency of each word units is computed (tf-idf).
 
-```
+```python
 def feature(x_var):
     # tokenisation and vectorization of x data
     # break down x data to word units, add 1-grams and 2-grams
@@ -111,7 +112,7 @@ def feature(x_var):
 
 ### Call all data prep functions
 
-```
+```python
 def prep_data():
     # get data
     model_data = load_data()
@@ -124,7 +125,7 @@ def prep_data():
     return (X_train, X_test, y_train, y_test)
 
 X_train, X_test, y_train, y_test = prep_data()
-```
+```python
 The output of this step are four sets of data:
 * X_train: transformed text that will be used to train the model
 * y_train: labels matching X_train, used as reference to train the model 
@@ -133,11 +134,11 @@ The output of this step are four sets of data:
 
 
 The algorithms (Logistic regression, SVM and Naive Bayes) have been tested with a range of parameters and values to determine which ones could asignificantly impact the model's performance. They don't all appear in the code below as this was an incremental process of trial and error.
-
+```
 
 ### Logistic regression
 
-```
+```python
 # pipeline data vectorisation => transformation => feature reduction => classifier
 lg_clf = Pipeline([('vect', CountVectorizer()),
                    ('tfidf', TfidfTransformer()),
@@ -173,7 +174,7 @@ Note about PCA: it does not improve the performance of the Logistic Regression m
 
 ### Naive Bayes
 
-```
+```python
 # pipeline data vectorisation => transformation => classifier
 nb_clf = Pipeline([('vect', CountVectorizer()),
                    ('tfidf', TfidfTransformer()),
@@ -207,7 +208,7 @@ for param_name in sorted(nb_parameters.keys()):
 
 ### SVM
 
-```
+```python
 # pipeline data vectorisation => transformation => feature reduction => classifier
 svm_clf = Pipeline([('vect', CountVectorizer()),
                    ('tfidf', TfidfTransformer()),

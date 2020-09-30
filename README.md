@@ -1,3 +1,4 @@
+![Project banner](https://github.com/raphaele42/sentiment_a/blob/master/Sentiment.png "Tweets")
 # Sentiment Analysis of a corpus of tweets
  
 **Summary:** The goal of this project is to predict the sentiment on a corpus of tweets as positive or negative. An app was developed for users to select the best model and apply it to a new set of tweets. The steps of the project are: building a corpus of labelled tweets, selecting models to compare and publishing an app for users to select the most performant model.

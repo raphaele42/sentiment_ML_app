@@ -158,6 +158,7 @@ def main():
     # sidebar content #
     ###################
     
+    st.sidebar.markdown('_[See code and documentation](https://github.com/raphaele42/sentiment_a)_.')
     st.sidebar.subheader("Choose a classifier")
     classifier = st.sidebar.selectbox('Choose an algorithm:', ("Support Vector Machine (SVM)", "Logistic Regression", "Naive Bayes"))
     

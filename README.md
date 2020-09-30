@@ -19,7 +19,7 @@ Table of content
 
 The model will be trained on a set of 1220 tweets labelled as positive or negative. The corpus is built by collating a list of labelled IDs with the corresponding tweet text, via the Twitter API. Output: a text file to train the model and a text file with new unclassified tweets.
 
-Full code available here: https://github.com/raphaele42/sentiment_a/blob/master/tweet_corpus.py
+Full code available [here](https://github.com/raphaele42/sentiment_a/blob/master/tweet_corpus.py).
 
 
 
@@ -52,6 +52,8 @@ from sklearn import metrics
 
 ### Import data
 
+Importing the data set that was built [here](https://github.com/raphaele42/sentiment_a/blob/master/tweet_corpus.py). 
+
 ```
 def load_data():
     # import tweet data as collected in tweet_corpus.py
@@ -61,6 +63,8 @@ def load_data():
     return model_data
 ```
 ### Pre-processing data
+
+Cleaning the tweets invlove turning all text into lower case standard characters, to prepare it for vectorisation. Then the data is split into prediction (y) and explanatory (x) variables.
 
 ```
 
@@ -88,6 +92,8 @@ def split_variables(full_data):
 ```
 
 ### Feature extraction
+
+To make the x variables compatible with the selected algorithm, the simple text must be broken down into word units (tokenisation) of single words (1-grams) or 2 words (2-grams). The data is then turned into numbers (vectorisation) and the frequency of each word units is computed (tf-idf).
 
 ```
 def feature(x_var):
@@ -119,6 +125,15 @@ def prep_data():
 
 X_train, X_test, y_train, y_test = prep_data()
 ```
+The output of this step are four sets of data:
+* X_train: transformed text that will be used to train the model
+* y_train: labels matching X_train, used as reference to train the model 
+* X_test: transformed text that will be used to make label prediction with the trained model
+* y_test: transformed text that will be compared to classes predicted by the model for X_test data
+
+
+The algorithms (Logistic regression, SVM and Naive Bayes) have been tested with a range of parameters and values to determine which ones could asignificantly impact the model's performance. They don't all appear in the code below as this was an incremental process of trial and error.
+
 
 ### Logistic regression
 
@@ -152,15 +167,13 @@ for param_name in sorted(lg_parameters.keys()):
 #tfidf__use_idf: True
 #vect__ngram_range: (1, 1)
     
-# note about PCA: it does not improve performance and increases running time significantly,
-# so no feature reduction will be applied to these models
 ```
+
+Note about PCA: it does not improve the performance of the Logistic Regression modela and increases the running time significantly. For this reason, no feature reduction will be applied to these models.
 
 ### Naive Bayes
 
 ```
-
-
 # pipeline data vectorisation => transformation => classifier
 nb_clf = Pipeline([('vect', CountVectorizer()),
                    ('tfidf', TfidfTransformer()),
@@ -192,9 +205,7 @@ for param_name in sorted(nb_parameters.keys()):
 #vect__ngram_range: (1, 1)
 ```
 
-
 ### SVM
-
 
 ```
 # pipeline data vectorisation => transformation => feature reduction => classifier
@@ -233,7 +244,14 @@ for param_name in sorted(svm_parameters.keys()):
 
 
 
-### Conclusions:
+### Conclusions
+
+After running these 3 algorithms with a range of parameters and values, decisions are made for the app offering:
+* Feature extraction options: n-gram size and use of idf.
+* Parameters for Logistic Regression: `C`, `max_iter` and `penalty`.
+* Parameters for SVM: `loss`, `penalt`y and `alpha`.
+* Parameters for Naive Bayes: `alpha` and `fit_prior`.
+* No feature reduction will be offered.
 
 Full code fir this step is here: https://github.com/raphaele42/sentiment_a/blob/master/tw_sa_mod.py
 

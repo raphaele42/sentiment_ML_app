@@ -2,6 +2,8 @@
  
 **Summary:** The goal of this project is to predict the sentiment on a corpus of tweets as positive or negative. An app was developed for users to select the best model and apply it to a new set of tweets. The steps of the project are: bulding a corpus of labelled tweets, selecting models to compare and publishing an app for users to select the most performant model.
 
+**Try the app:** [https://twsent.herokuapp.com/](https://twsent.herokuapp.com/)
+
 **Technologies:**
 * Python
 * Scikit Learn
@@ -14,14 +16,6 @@
 * [Application](#application)
 
 
-Sentiment analysis of social media posts.
- Online app is here: https://twsent.herokuapp.com/
- do you see the change?
-Screen shots / screencast
-BAnner
-Diagram of the process?
-
-
 <a name="corpus"/>
 
 ## 1 - Corpus
@@ -29,7 +23,6 @@ Diagram of the process?
 The model will be trained on a set of 1220 tweets labelled as positive or negative. The corpus is built by collating a list of labelled IDs with the corresponding tweet text, via the Twitter API. Output: a text file to train the model and a text file with new unclassified tweets.
 
 Full code available [here](https://github.com/raphaele42/sentiment_a/blob/master/tweet_corpus.py).
-
 
 
 <a name="model"/>
@@ -269,15 +262,15 @@ Full code fir this step is here: https://github.com/raphaele42/sentiment_a/blob/
 
 ## 3 - Application
 
-Code is here: https://github.com/raphaele42/sentiment_a/blob/master/tw_sa_app.py
+Full coode is [here](https://github.com/raphaele42/sentiment_a/blob/master/tw_sa_app.py).
 
-The app works as follows:
+The [app](https://twsent.herokuapp.com/) works as follows:
  
-1 - Train three different algorithms and optimise them to get the best models for each one.
+1. Train three different algorithms and optimise them to get the best models for each one.
 
-2 - Select the best model to analyse the sentiment in a new set of tweets.
+2. Select the best model to analyse the sentiment in a new set of tweets.
 
-3 - Get a preview of the results and download the csv file with labelled tweets.
+3. Get a preview of the results and download the csv file with labelled tweets.
 
 ### Import modules
 
@@ -435,6 +428,7 @@ def main():
     # sidebar content #
     ###################
     
+    st.sidebar.markdown('_[See code and documentation](https://github.com/raphaele42/sentiment_a)_.')
     st.sidebar.subheader("Choose a classifier")
     classifier = st.sidebar.selectbox('Choose an algorithm:', ("Support Vector Machine (SVM)", "Logistic Regression", "Naive Bayes"))
     

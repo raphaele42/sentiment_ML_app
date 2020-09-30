@@ -7,13 +7,12 @@ Created on Mon Sep 21 13:08:16 2020
 """
 
 import streamlit as st
-import json
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
-from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
-from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
+from sklearn.linear_model import LogisticRegression
+from sklearn.naive_bayes import MultinomialNB
 from sklearn.linear_model import SGDClassifier
 from sklearn.metrics import plot_confusion_matrix, plot_roc_curve
 from sklearn.metrics import precision_score, recall_score
@@ -22,9 +21,7 @@ from pandas import Series, DataFrame  #needed
 import matplotlib.pyplot as plt
 import plotly.express as px
 import base64
-
-
-
+import json
 
 ###########################
 # import data
@@ -38,11 +35,14 @@ def load_data():
     # read the tweets file to a list
     with open('model_tweets.txt', 'r') as f:
         model_data = json. loads(f. read())
+    # returns a dataframe
     return model_data
 
 ###########################
 # best models data
 ###########################
+
+# caching this object so it is not refreshed each time the script runs
 @st.cache(persist=True, suppress_st_warning=True, allow_output_mutation=True)
 def load_best_data():
     # initiate data frame to store perf and parameters of best models
@@ -60,7 +60,6 @@ def load_best_data():
 ########################
 
 # clean tweets text
-
 def clean_text(raw_tweets):
     import re
     for tweet in raw_tweets:
@@ -73,9 +72,7 @@ def clean_text(raw_tweets):
     #return ' '.join(tweet) 
     return(raw_tweets)              
 
-
 # split data into x and y
-
 def split_variables(full_data):
     # object for explantory data ie tweets text
     x_tweet_text = [tweet['text'] for tweet in full_data]
@@ -89,17 +86,14 @@ def split_variables(full_data):
 ########################
 
 def get_table_download_link(df):
-    """Generates a link allowing the data in a given panda dataframe to be downloaded
-    in:  dataframe
-    out: href string
-    """
+    # generate a link allowing the labelled data generated bu the model to be downloaded
+    #in:  dataframe
+    #out: href string
     csv = df.to_csv(index=False)
     b64 = base64.b64encode(csv.encode()).decode()  # some strings <-> bytes conversions necessary here
     href = f'<a href="data:file/csv;base64,{b64}">Download csv file</a>'
     return href
 
-
-     
 
 ########################
 # main function
@@ -108,6 +102,7 @@ def get_table_download_link(df):
 def main():
     
     def plot_metrics():
+    # define plots for ROC curve and confusion matrix
         
         st.subheader('ROC Curve')
         st.write('You can also use the ROC curve to adjuste the model parameters: the best model will show a blue line as close as possible to the dotted red line.')
@@ -121,32 +116,35 @@ def main():
         st.pyplot()
 
         
-        
+    # load and apply pre processing to data
     data = load_data()
     clean_data = clean_text(data)  
     class_names = ['positive', 'negative']
     y_var, x_var = split_variables(clean_data)
     # split x data into training and test set on a 80/20 basis
     X_train, X_test, y_train, y_test = train_test_split(x_var, y_var, test_size=0.2, random_state=42)
-
+    
+    # initiate df to store best models performance
     best_models = load_best_data()
     
     # initiate df to store current model performance
     curr_perf = DataFrame(columns=['Accuracy', 'Precision','Recall']) 
     
+    # copy - explain the functionning of the app
     st.title('Tweets sentiment prediction')
-    
     st.write('To determine positive and negative sentiments in a set of un-labelled tweets, we will:')
     st.write('1 - Train three different algorithms and optimise them to get the best models for each one.')
     st.write('2 - Select the best model to analyse the sentiment in a new set of tweets.')
     st.write('3 - Get a preview of the results and download the csv file with labelled tweets.')
-
-
+    
+    # copy - give insights in the initial data ser
     pos_y_sentiment = [i for i in y_var if i == 'positive']
     pos_perc = (100*len(pos_y_sentiment)/len(y_var))
     st.write('The training data set includes ', len(y_var), ' tweets, including ',round(pos_perc, 2), '% classified as positive.')
     
-     
+    ############# 
+    # section 1 #
+    #############
     
     st.header('1 - Find the best model')
     
@@ -156,8 +154,16 @@ def main():
              the model. For each algorithm tested, the best model and its \
              parameters are saved in the table in section 2.')
     
+    ################### 
+    # sidebar content #
+    ###################
+    
     st.sidebar.subheader("Choose a classifier")
     classifier = st.sidebar.selectbox('Choose an algorithm:', ("Support Vector Machine (SVM)", "Logistic Regression", "Naive Bayes"))
+    
+    ################### 
+    # sidebar for SVM #
+    ###################
     
     if classifier == 'Support Vector Machine (SVM)':
         # choose text encoding
@@ -178,22 +184,23 @@ def main():
                    ('clf', SGDClassifier(loss = loss, penalty = penalty_svm, 
                                          alpha=alpha_svm, random_state=42, 
                                          max_iter=5, tol=None))])
+        # fit the model
         model.fit(X_train, y_train)
-        
-        
+        # prediction on test data
         y_pred = model.predict(X_test)
        
-        
+        # perf scores for svm
         accuracy_svm = model.score(X_test, y_test).round(2)        
         precision_svm = precision_score(y_test, y_pred, pos_label='positive').round(2)
         recall_svm = recall_score(y_test, y_pred, pos_label='positive').round(2)
         
+        # populate the best perf table
         curr_perf_new = {'Accuracy': accuracy_svm, 'Precision' : precision_svm, 'Recall' : recall_svm}
         curr_perf = curr_perf.append(curr_perf_new, ignore_index=True) 
         curr_perf = curr_perf.rename(index={0: 'Score'})
         st.table(curr_perf)
         
-        
+        # update the best perf table if new model is better than current best one
         if (accuracy_svm > best_models.iloc[0, 1]):
             best_models.iloc[0, 1] = accuracy_svm
             best_models.iloc[1, 1] = precision_svm
@@ -207,6 +214,10 @@ def main():
             
         plot_metrics()
         
+    ################### 
+    # sidebar for LR  #
+    ###################
+    
     if classifier == 'Logistic Regression':
         # choose text encoding
         st.sidebar.subheader("Feature extraction")
@@ -225,20 +236,23 @@ def main():
                    ('tfidf', TfidfTransformer(use_idf = use_idf_lr)),
                    ('clf', LogisticRegression(C=C, max_iter=max_iter, 
                                               penalty = penalty_lr, random_state=42))])
+        # fir the model
         model.fit(X_train, y_train)
-        
-        
+        # predict the sentiment on test data
         y_pred = model.predict(X_test)
+        
+        # perf scores for lr
         accuracy_lr = model.score(X_test, y_test).round(2)
         precision_lr = precision_score(y_test, y_pred, pos_label='positive').round(2)
         recall_lr = recall_score(y_test, y_pred, pos_label='positive').round(2)
         
-        
+        # populate the best perf table
         curr_perf_new = {'Accuracy': accuracy_lr, 'Precision' : precision_lr, 'Recall' : recall_lr}
         curr_perf = curr_perf.append(curr_perf_new, ignore_index=True) 
         curr_perf = curr_perf.rename(index={0: 'Score'})
         st.table(curr_perf)
         
+        # update the best perf table if new model is better than current best
         if (accuracy_lr > best_models.iloc[0, 2]):
             best_models.iloc[0, 2] = accuracy_lr
             best_models.iloc[1, 2] = precision_lr
@@ -249,8 +263,12 @@ def main():
             best_models.iloc[9, 2] = max_iter
             best_models.iloc[6, 2] = penalty_lr
             
-        
+        # plot ROC and confusion matrix
         plot_metrics()
+    
+    ################### 
+    # sidebar for NB  #
+    ###################
     
     if classifier == 'Naive Bayes':
          # choose text encoding
@@ -261,27 +279,29 @@ def main():
         #choose parameters
         alpha_nb = st.sidebar.radio('Alpha (to multiply the penalty)', (0.0001, 0.001, 0.01, 0.1))
         fit_prior = st.sidebar.radio('Learn class prior probabilities', ('True', 'False'))
-
     
         st.subheader("Current Naive Bayes results:")
 
         model = Pipeline([('vect', CountVectorizer(analyzer='word', ngram_range=ngram_range_nb)),
                    ('tfidf', TfidfTransformer(use_idf = use_idf_nb)),
                    ('clf', MultinomialNB(alpha = alpha_nb, fit_prior = fit_prior))])
+        # fit model
         model.fit(X_train, y_train)
-       
+        # prediction on test data
         y_pred = model.predict(X_test)
         
+        # performance scores for naive bayes
         accuracy_nb = model.score(X_test, y_test).round(2)
         precision_nb = precision_score(y_test, y_pred, pos_label='positive').round(2)
         recall_nb = recall_score(y_test, y_pred, pos_label='positive').round(2)
         
-        
+        # populate the best performance table
         curr_perf_new = {'Accuracy': accuracy_nb, 'Precision' : precision_nb, 'Recall' : recall_nb}
         curr_perf = curr_perf.append(curr_perf_new, ignore_index=True) 
         curr_perf = curr_perf.rename(index={0: 'Score'})
         st.table(curr_perf)
         
+        # update the best performance table if the new model is better than current best
         if (accuracy_nb > best_models.iloc[0, 3]):
             best_models.iloc[0, 3] = accuracy_nb
             best_models.iloc[1, 3] = precision_nb
@@ -290,17 +310,27 @@ def main():
             best_models.iloc[4, 3] = use_idf_nb
             best_models.iloc[8, 3] = alpha_nb
             best_models.iloc[9, 3] = fit_prior
-        
+        # plot ROC curbe and confusion matrix
         plot_metrics()
         
+    
+    ############# 
+    # section 2 #
+    #############
     
     st.header('2 - Select your model')
 
     st.write('For each algorithm tested, the best model and its parameters are saved in the table below.')
     
+    # display best model and its parameters for each algorithm
     st.dataframe(best_models)
     
+    # the use can now select the model to predict sentiment on new set of tweets
     sel_model = st.radio('Select the model you want to use to analyse the new tweets:', ('SVM', 'Logistic Regression', 'Naive Bayes'))
+    
+    ############# 
+    # section 3 #
+    #############
     
     st.header('3 - View results of prediction with the selected model')
     
@@ -310,9 +340,11 @@ def main():
     with open('new_tweets.txt', 'r') as f:
         new_data = json. loads(f. read())
     
+    # pre process new tweets
     clean_new_tweets = clean_text(new_data)
     new_tweet_text = [tweet['text'] for tweet in clean_new_tweets]
     
+    # apply SVM to new tweets
     if sel_model == 'SVM':
         # pick the parameter values from the best model matrix
         best_ngram_range = best_models.iloc[3, 1]
@@ -333,6 +365,7 @@ def main():
         new_pred = model.predict(new_tweet_text)
      
         
+    # apply LR to new tweets
     if sel_model == 'Logistic Regression':
         # pick the parameter values from the best model matrix
         best_ngram_range = best_models.iloc[3, 2]
@@ -351,6 +384,8 @@ def main():
         # use newly trained model to predict new tweets labels
         new_pred = model.predict(new_tweet_text)
         
+        
+    # apply NB to new tweets
     if sel_model == 'Naive Bayes':
         # pick the parameter values from the best model matrix
         best_ngram_range = best_models.iloc[3, 3]
@@ -367,7 +402,9 @@ def main():
         # use newly trained model to predict new tweets labels
         new_pred = model.predict(new_tweet_text)
 
+    
     # build a data set with text + new sentiment labels
+    
     # import unlabelled and raw tweets
     with open('new_tweets.txt', 'r') as f:
         new_data = json. loads(f. read())
@@ -377,6 +414,7 @@ def main():
     # bring together raw text and sentiment label
     new_labelled_tweets = zip(new_tweet_og_text,list(new_pred))
     zipped_list = list(new_labelled_tweets)
+    
     # change to df format for easier data exploratio n
     df_new_tweets = DataFrame (zipped_list,columns=['Text', 'Sentiment'])  
     
@@ -398,15 +436,9 @@ def main():
     st.write('\n\nNegative tweets:') 
     st.table(ntweets[0:5])
     
+    # show the download link for new labelled tweets (result of prediction)
     st.markdown(get_table_download_link(df_new_tweets), unsafe_allow_html=True)
-#    st.markdown(href, unsafe_allow_html=True)
-        
     
 if __name__ == '__main__':
     main()
    
-    
-    
-
-
-

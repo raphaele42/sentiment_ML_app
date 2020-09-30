@@ -1,7 +1,4 @@
 # Sentiment Analysis of a corpus of tweets
-Sentiment analysis of social media posts.
- Online app is here: https://twsent.herokuapp.com/
- do you see the change?
  
 **Summary:** The goal of this project is to predict the sentiment on a corpus of tweets as positive or negative. An app was developed for users to select the best model and apply it to a new set of tweets. The steps of the project are: bulding a corpus of labelled tweets, selecting models to compare and publishing an app for users to select the most performant model.
 
@@ -17,7 +14,16 @@ Sentiment analysis of social media posts.
 * [Application](#application)
 
 
+Sentiment analysis of social media posts.
+ Online app is here: https://twsent.herokuapp.com/
+ do you see the change?
+Screen shots / screencast
+BAnner
+Diagram of the process?
+
+
 <a name="corpus"/>
+
 ## 1 - Corpus
 
 The model will be trained on a set of 1220 tweets labelled as positive or negative. The corpus is built by collating a list of labelled IDs with the corresponding tweet text, via the Twitter API. Output: a text file to train the model and a text file with new unclassified tweets.
@@ -27,6 +33,7 @@ Full code available [here](https://github.com/raphaele42/sentiment_a/blob/master
 
 
 <a name="model"/>
+
 ## 2 - Model selection
 
 **Goal:** explore three algortithms to determine if they are relevant to perform this task and what range of hyper parameters can ve provided to users for optimisation.
@@ -259,9 +266,10 @@ Full code fir this step is here: https://github.com/raphaele42/sentiment_a/blob/
 
 
 <a name="application"/>
+
 ## 3 - Application
 
-
+Code is here: https://github.com/raphaele42/sentiment_a/blob/master/tw_sa_app.py
 
 The app works as follows:
  
@@ -271,15 +279,7 @@ The app works as follows:
 
 3 - Get a preview of the results and download the csv file with labelled tweets.
 
-Screen shots / screencast
-
-Table of content (inline: https://github.com/amitmerchant1990/electron-markdownify#readme)
-
-BAnner
-
-Diagram of the process?
 
 
-Summary
 
-Technologies
+

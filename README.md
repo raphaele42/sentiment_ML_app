@@ -4,12 +4,9 @@
 
 **Try the app:** [https://twsent.herokuapp.com/](https://twsent.herokuapp.com/)
 
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=YOUTUBE_VIDEO_ID_HERE
-" target="_blank"><img src="http://img.youtube.com/vi/p4adZ2ZYfAo/0.jpg" 
-alt="Preview of the app functionalities" width="600" border="10" /></a>
+![Preview of section 2](https://github.com/raphaele42/sentiment_a/blob/master/preview.png "Preview")
 
-
-[![Preview](http://img.youtube.com/vi/p4adZ2ZYfAo/0.jpg)](http://www.youtube.com/watch?v=p4adZ2ZYfAo)
+[Preview video (1.23 minutes](http://www.youtube.com/watch?v=p4adZ2ZYfAo)
 
 **Technologies:**
 * Python

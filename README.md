@@ -3,7 +3,7 @@
  
 **Summary:** The goal of this project is to predict the sentiment on a corpus of tweets as positive or negative. An app was developed for users to select the best model and apply it to a new set of tweets. The steps of the project are: building a corpus of labelled tweets, selecting models to compare and publishing an app for users to select the most performant model.
 
-**Results:** The goal for this project was to reach the industry benchmark for sentiment analysis accuracy: 70-80%. The goals was exceeded the accuracy yielded by each model was equal or above 80%.
+**Results:** The goal for this project was to reach the industry benchmark for sentiment analysis accuracy: 70-80%. The goal was exceeded as the accuracy of each model was equal or above 80%.
 
 **Try the app:** [https://twsent.herokuapp.com/](https://twsent.herokuapp.com/)
 

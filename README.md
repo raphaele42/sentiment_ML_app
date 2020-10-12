@@ -1,4 +1,4 @@
-![SA banner](https://github.com/raphaele42/sentiment_a/blob/master/Sentiment.png "sentiment analysis") ![python logo](https://github.com/raphaele42/sentiment_ML_app/blob/master/python.png "python logo") ![streamlit logo](https://github.com/raphaele42/sentiment_ML_app/blob/master/streamlit.png "streamlit logo")
+![SA banner](https://github.com/raphaele42/sentiment_a/blob/master/Sentiment.png "sentiment analysis") ![python logo](https://github.com/raphaele42/sentiment_ML_app/blob/master/python-small.png "python logo") ![streamlit logo](https://github.com/raphaele42/sentiment_ML_app/blob/master/streamlit.png "streamlit logo")
 # Sentiment Analysis of a corpus of tweets
  
 **Summary:** The goal of this project is to predict the sentiment on a corpus of tweets as positive or negative. An app was developed for users to select the best model and apply it to a new set of tweets. The steps of the project are: 

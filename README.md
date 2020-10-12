@@ -136,54 +136,18 @@ def prep_data():
     return (X_train, X_test, y_train, y_test)
 
 X_train, X_test, y_train, y_test = prep_data()
-```python
+```
 The output of this step are four sets of data:
 * X_train: transformed text that will be used to train the model
 * y_train: labels matching X_train, used as reference to train the model 
 * X_test: transformed text that will be used to make label prediction with the trained model
 * y_test: transformed text that will be compared to classes predicted by the model for X_test data
 
-
 The algorithms (Logistic regression, SVM and Naive Bayes) have been tested with a range of parameters and values to determine which ones could asignificantly impact the model's performance. They don't all appear in the code below as this was an incremental process of trial and error.
-```
-
-### Logistic regression
-
-```python
-# pipeline data vectorisation => transformation => feature reduction => classifier
-lg_clf = Pipeline([('vect', CountVectorizer()),
-                   ('tfidf', TfidfTransformer()),
-                   ('pca', TruncatedSVD()),
-                   ('clf', LogisticRegression())])
-
-# parameter tuning with grid search
-# train and test model with all combinations of parameters
-# to identify most performant
-lg_parameters = {'vect__ngram_range': [(1, 1), (1, 2)], 
-                                       'tfidf__use_idf': (True, False),
-                                       'pca__n_components': [400, 450, 500]
-                                       }
-
-# set grid search instance
-gs_lg_clf = GridSearchCV(lg_clf, lg_parameters, cv=5, n_jobs=-1)
-
-# fit the grid search instance
-gs_lg_clf = gs_lg_clf.fit(X_train, y_train)
-
-# which performed best?
-gs_lg_clf.best_score_  # accuracy 0.79 withoput PCA , it is 0.66 with PCA
-for param_name in sorted(lg_parameters.keys()):
-    print("%s: %r" % (param_name, gs_lg_clf.best_params_[param_name]))
-# best parameters:
-#pca__n_components: 450
-#tfidf__use_idf: True
-#vect__ngram_range: (1, 1)
-    
-```
 
 Note about PCA: it does not improve the performance of the Logistic Regression modela and increases the running time significantly. For this reason, no feature reduction will be applied to these models.
 
-### Naive Bayes
+### Example of pipeline with grid search with Naive Bayes
 
 ```python
 # pipeline data vectorisation => transformation => classifier
@@ -217,45 +181,6 @@ for param_name in sorted(nb_parameters.keys()):
 #vect__ngram_range: (1, 1)
 ```
 
-### SVM
-
-```python
-# pipeline data vectorisation => transformation => feature reduction => classifier
-svm_clf = Pipeline([('vect', CountVectorizer()),
-                   ('tfidf', TfidfTransformer()),
-                   ('pca', TruncatedSVD(n_components = 450)),
-                   ('clf', SGDClassifier(
-                                         alpha=1e-3, random_state=42,
-                                         max_iter=5, tol=None))])
-
-# parameter tuning with grid search
-# train and test model with all combinations of parameters
-# to identify most performant
-svm_parameters = {'vect__ngram_range': [(1, 1), (1, 2)], 
-                                       'tfidf__use_idf': (True, False),
-                                       #'pca__n_components': [440],
-                                       'clf__loss': ('hinge','squared_hinge'),
-                                       'clf__penalty': ('l2', 'l1', 'elasticnet')
-                                       }
-# set grid search instance
-svm_nb_clf = GridSearchCV(svm_clf, svm_parameters, cv=5, n_jobs=-1)
-
-# fit the grid search instance
-svm_nb_clf = svm_nb_clf.fit(X_train, y_train)
-
-# which performed best?
-svm_nb_clf.best_score_  # 0.8173259310663891
-for param_name in sorted(svm_parameters.keys()):
-    print("%s: %r" % (param_name, svm_nb_clf.best_params_[param_name]))
-# best parameters
-#clf__loss: 'hinge'
-#clf__penalty: 'l2'
-#tfidf__use_idf: True
-#vect__ngram_range: (1, 1)
-```
-
-
-
 ### Conclusions
 
 After running these 3 algorithms with a range of parameters and values, decisions are made for the app offering:
@@ -276,51 +201,16 @@ Full coode is [here](https://github.com/raphaele42/sentiment_a/blob/master/tw_sa
 
 The [app](https://twsent.herokuapp.com/) works as follows:
  
-1. Train three different algorithms and optimise them to get the best models for each one.
+1. Train three different algorithms and optimise them to get the best models for each one. Store the hyper parameters of the best model. 
 
-2. Select the best model to analyse the sentiment in a new set of tweets.
+2. Allow user to select the best model to analyse the sentiment in a new set of tweets.
 
-3. Get a preview of the results and download the csv file with labelled tweets.
+3. Give a preview of the results and download the csv file with labelled tweets.
 
-### Import modules
-
-```python
-import streamlit as st
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.feature_extraction.text import TfidfTransformer
-from sklearn.model_selection import train_test_split
-from sklearn.pipeline import Pipeline
-from sklearn.linear_model import LogisticRegression
-from sklearn.naive_bayes import MultinomialNB
-from sklearn.linear_model import SGDClassifier
-from sklearn.metrics import plot_confusion_matrix, plot_roc_curve
-from sklearn.metrics import precision_score, recall_score
-import matplotlib  #needed by heroku for executing plot confusion matrix
-from pandas import Series, DataFrame  #needed
-import matplotlib.pyplot as plt
-import plotly.express as px
-import base64
-import json
-```
-
-
-### Import data
-
-```python
-# import and cache the data
-@st.cache(persist=True, suppress_st_warning=True, allow_output_mutation=True)
-def load_data():
-    # import tweet data as collected in tweet_corpus.py
-    # read the tweets file to a list
-    with open('model_tweets.txt', 'r') as f:
-        model_data = json. loads(f. read())
-    # returns a dataframe
-    return model_data
-```
 
 ### Object for best models
 
-This dataframe will store the scores and parameter values for the best performing scores. AS the streamlit script will re run each time a new parameter is selected in the widgets, this object object is cache so it will only be update when a new best score is found.
+This dataframe will store the scores and parameter values for the best performing scores. As the streamlit script will re run each time a new parameter is selected in the widgets, this object is cached so it will only be updated when a new best score is found.
 
 ```python
 @st.cache(persist=True, suppress_st_warning=True, allow_output_mutation=True)
@@ -336,33 +226,6 @@ def load_best_data():
     return best_models
 ```
 
-
-### Pre processing data
-
-
-```python
-# clean tweets text
-def clean_text(raw_tweets):
-    import re
-    for tweet in raw_tweets:
-        # all text in lower case
-        tweet['text'] = tweet['text'].lower()
-        # remove urls
-        tweet['text'] = re.sub(r"http\S+|www\S+|https\S+", '', tweet['text'], flags=re.MULTILINE)
-        # remove user references and '#'
-        tweet['text'] = re.sub(r'\@\w+|\#','', tweet['text'])
-    #return ' '.join(tweet) 
-    return(raw_tweets)              
-
-# split data into x and y
-def split_variables(full_data):
-    # object for explantory data ie tweets text
-    x_tweet_text = [tweet['text'] for tweet in full_data]
-    # object for target variable ie sentiment
-    y_tweet_sentiment = [tweet['label'] for tweet in full_data]
-    return(y_tweet_sentiment, x_tweet_text)
-```
-
 ### Function to download the new labelled tweets
 
 ```python
@@ -376,64 +239,9 @@ def get_table_download_link(df):
     return href
 ```
 
-### Main function
+### Example of side bar for the SVM model
 
-```python
-def main():
-    
-    def plot_metrics():
-    # define plots for ROC curve and confusion matrix
-        
-        st.subheader('ROC Curve')
-        st.write('You can also use the ROC curve to adjuste the model parameters: the best model will show a blue line as close as possible to the dotted red line.')
-        plot_roc_curve(model, X_test, y_test, lw=1)
-        plt.plot([0, 0, 1], [0, 1, 1], color='red', lw=0.5, linestyle='--')
-        st.pyplot()
-        
-        st.subheader("Confusion Matrix")
-        st.write('The confusion matrix shows how well the model spots negative and positive sentiments. We want as many entries as possible in the True Positive (top left) and True Negative (bottom right) cells.')
-        plot_confusion_matrix(model, X_test, y_test, display_labels=class_names, cmap=plt.cm.BuPu)
-        st.pyplot()
-
-        
-    # load and apply pre processing to data
-    data = load_data()
-    clean_data = clean_text(data)  
-    class_names = ['positive', 'negative']
-    y_var, x_var = split_variables(clean_data)
-    # split x data into training and test set on a 80/20 basis
-    X_train, X_test, y_train, y_test = train_test_split(x_var, y_var, test_size=0.2, random_state=42)
-    
-    # initiate df to store best models performance
-    best_models = load_best_data()
-    
-    # initiate df to store current model performance
-    curr_perf = DataFrame(columns=['Accuracy', 'Precision','Recall']) 
-    
-    # copy - explain the functionning of the app
-    st.title('Tweets sentiment prediction')
-    st.write('To determine positive and negative sentiments in a set of un-labelled tweets, we will:')
-    st.write('1 - Train three different algorithms and optimise them to get the best models for each one.')
-    st.write('2 - Select the best model to analyse the sentiment in a new set of tweets.')
-    st.write('3 - Get a preview of the results and download the csv file with labelled tweets.')
-    
-    # copy - give insights in the initial data ser
-    pos_y_sentiment = [i for i in y_var if i == 'positive']
-    pos_perc = (100*len(pos_y_sentiment)/len(y_var))
-    st.write('The training data set includes ', len(y_var), ' tweets, including ',round(pos_perc, 2), '% classified as positive.')
-    
-    ############# 
-    # section 1 #
-    #############
-    
-    st.header('1 - Find the best model')
-    
-    st.write('Choose a classifier in the left hand side. Adjust the parameters \
-             in the left column and see how it impacts the model performance. \
-             Higher values in the table below indicate higher performance of \
-             the model. For each algorithm tested, the best model and its \
-             parameters are saved in the table in section 2.')
-    
+```python    
     ################### 
     # sidebar content #
     ###################
@@ -494,120 +302,11 @@ def main():
         
             
         plot_metrics()
-        
-    ################### 
-    # sidebar for LR  #
-    ###################
-    
-    if classifier == 'Logistic Regression':
-        # choose text encoding
-        st.sidebar.subheader("Feature extraction")
-        ngram_range_lr = st.sidebar.radio('N-grams (length of word groups to extract)', [(1, 1), (1, 2)], key = 'ngram_range_lr')
-        use_idf_lr = st.sidebar.radio('Use idf', ('True', 'False'), key = 'use_idf_lr')
-        st.sidebar.subheader("Model Hyperparameters")
-        #choose parameters
-        C = st.sidebar.number_input("C (Regularization parameter)", 5.0, 10.0, step=0.01, key='C_LR')
-        max_iter = st.sidebar.slider("Maximum number of iterations", 100, 500, key='max_iter')
-        #penalty = st.sidebar.radio('Penalty', ('l2', 'none'))
-        penalty_lr = st.sidebar.selectbox('Penalty (to penalise model complexity)', ('l2', 'none'))
-     
-        st.subheader("Current Logistic Regression results:")
-        
-        model = Pipeline([('vect', CountVectorizer(analyzer='word', ngram_range=ngram_range_lr)),
-                   ('tfidf', TfidfTransformer(use_idf = use_idf_lr)),
-                   ('clf', LogisticRegression(C=C, max_iter=max_iter, 
-                                              penalty = penalty_lr, random_state=42))])
-        # fir the model
-        model.fit(X_train, y_train)
-        # predict the sentiment on test data
-        y_pred = model.predict(X_test)
-        
-        # perf scores for lr
-        accuracy_lr = model.score(X_test, y_test).round(2)
-        precision_lr = precision_score(y_test, y_pred, pos_label='positive').round(2)
-        recall_lr = recall_score(y_test, y_pred, pos_label='positive').round(2)
-        
-        # populate the best perf table
-        curr_perf_new = {'Accuracy': accuracy_lr, 'Precision' : precision_lr, 'Recall' : recall_lr}
-        curr_perf = curr_perf.append(curr_perf_new, ignore_index=True) 
-        curr_perf = curr_perf.rename(index={0: 'Score'})
-        st.table(curr_perf)
-        
-        # update the best perf table if new model is better than current best
-        if (accuracy_lr > best_models.iloc[0, 2]):
-            best_models.iloc[0, 2] = accuracy_lr
-            best_models.iloc[1, 2] = precision_lr
-            best_models.iloc[2, 2] = recall_lr
-            best_models.iloc[3, 2] = ngram_range_lr
-            best_models.iloc[4, 2] = use_idf_lr
-            best_models.iloc[8, 2] = C
-            best_models.iloc[9, 2] = max_iter
-            best_models.iloc[6, 2] = penalty_lr
-            
-        # plot ROC and confusion matrix
-        plot_metrics()
-    
-    ################### 
-    # sidebar for NB  #
-    ###################
-    
-    if classifier == 'Naive Bayes':
-         # choose text encoding
-        st.sidebar.subheader('Feature extraction')
-        ngram_range_nb = st.sidebar.radio('N-grams (length of word groups to extract)', [(1, 1), (1, 2), (1, 3)])
-        use_idf_nb = st.sidebar.radio('Use idf', ('True', 'False'))
-        st.sidebar.subheader('Model Hyperparameters')
-        #choose parameters
-        alpha_nb = st.sidebar.radio('Alpha (to multiply the penalty)', (0.0001, 0.001, 0.01, 0.1))
-        fit_prior = st.sidebar.radio('Learn class prior probabilities', ('True', 'False'))
-    
-        st.subheader("Current Naive Bayes results:")
+```
+      
+### Example of applying the selected models to new data set with Logistic Regression
 
-        model = Pipeline([('vect', CountVectorizer(analyzer='word', ngram_range=ngram_range_nb)),
-                   ('tfidf', TfidfTransformer(use_idf = use_idf_nb)),
-                   ('clf', MultinomialNB(alpha = alpha_nb, fit_prior = fit_prior))])
-        # fit model
-        model.fit(X_train, y_train)
-        # prediction on test data
-        y_pred = model.predict(X_test)
-        
-        # performance scores for naive bayes
-        accuracy_nb = model.score(X_test, y_test).round(2)
-        precision_nb = precision_score(y_test, y_pred, pos_label='positive').round(2)
-        recall_nb = recall_score(y_test, y_pred, pos_label='positive').round(2)
-        
-        # populate the best performance table
-        curr_perf_new = {'Accuracy': accuracy_nb, 'Precision' : precision_nb, 'Recall' : recall_nb}
-        curr_perf = curr_perf.append(curr_perf_new, ignore_index=True) 
-        curr_perf = curr_perf.rename(index={0: 'Score'})
-        st.table(curr_perf)
-        
-        # update the best performance table if the new model is better than current best
-        if (accuracy_nb > best_models.iloc[0, 3]):
-            best_models.iloc[0, 3] = accuracy_nb
-            best_models.iloc[1, 3] = precision_nb
-            best_models.iloc[2, 3] = recall_nb
-            best_models.iloc[3, 3] = ngram_range_nb
-            best_models.iloc[4, 3] = use_idf_nb
-            best_models.iloc[8, 3] = alpha_nb
-            best_models.iloc[9, 3] = fit_prior
-        # plot ROC curbe and confusion matrix
-        plot_metrics()
-        
-    
-    ############# 
-    # section 2 #
-    #############
-    
-    st.header('2 - Select your model')
-
-    st.write('For each algorithm tested, the best model and its parameters are saved in the table below.')
-    
-    # display best model and its parameters for each algorithm
-    st.dataframe(best_models)
-    
-    # the use can now select the model to predict sentiment on new set of tweets
-    sel_model = st.radio('Select the model you want to use to analyse the new tweets:', ('SVM', 'Logistic Regression', 'Naive Bayes'))
+```python    
     
     ############# 
     # section 3 #
@@ -624,26 +323,6 @@ def main():
     # pre process new tweets
     clean_new_tweets = clean_text(new_data)
     new_tweet_text = [tweet['text'] for tweet in clean_new_tweets]
-    
-    # apply SVM to new tweets
-    if sel_model == 'SVM':
-        # pick the parameter values from the best model matrix
-        best_ngram_range = best_models.iloc[3, 1]
-        best_use_idf = best_models.iloc[4, 1]
-        best_loss = best_models.iloc[5, 1]
-        best_alpha = best_models.iloc[7, 1]
-        best_penalty = best_models.iloc[6, 1]
-            
-        # fit an train the model with best performing paraneters
-        model = Pipeline([('vect', CountVectorizer(analyzer='word', ngram_range=best_ngram_range)),
-                   ('tfidf', TfidfTransformer(use_idf = best_use_idf)),
-                   ('clf', SGDClassifier(loss = best_loss, penalty = best_penalty, 
-                                         alpha=best_alpha, random_state=42, 
-                                         max_iter=5, tol=None))])
-        model.fit(X_train, y_train)
-        
-            # use newly trained model to predict new tweets labels
-        new_pred = model.predict(new_tweet_text)
      
         
     # apply LR to new tweets
@@ -664,26 +343,12 @@ def main():
         
         # use newly trained model to predict new tweets labels
         new_pred = model.predict(new_tweet_text)
-        
-        
-    # apply NB to new tweets
-    if sel_model == 'Naive Bayes':
-        # pick the parameter values from the best model matrix
-        best_ngram_range = best_models.iloc[3, 3]
-        best_use_idf = best_models.iloc[4, 3]
-        best_alpha_nb = best_models.iloc[8, 3]
-        best_fit_prior = best_models.iloc[9, 3]
-            
-            # fit an train the model with best performing paraneters
-        model = Pipeline([('vect', CountVectorizer(analyzer='word', ngram_range=best_ngram_range)),
-                   ('tfidf', TfidfTransformer(use_idf = best_use_idf)),
-                   ('clf', MultinomialNB(alpha = best_alpha_nb, fit_prior = best_fit_prior))])
-        model.fit(X_train, y_train)
-        
-        # use newly trained model to predict new tweets labels
-        new_pred = model.predict(new_tweet_text)
+```
 
-    
+### Build the data set of newly labelled tweets and add the download link
+
+```python
+        
     # build a data set with text + new sentiment labels
     
     # import unlabelled and raw tweets
@@ -720,8 +385,6 @@ def main():
     # show the download link for new labelled tweets (result of prediction)
     st.markdown(get_table_download_link(df_new_tweets), unsafe_allow_html=True)
     
-if __name__ == '__main__':
-    main()
 ```
 
 
